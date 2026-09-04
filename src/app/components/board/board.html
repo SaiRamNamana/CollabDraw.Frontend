@@ -1,0 +1,199 @@
+<div [class.dark]="darkMode" class="h-screen overflow-hidden bg-slate-100 text-slate-800 flex flex-col select-none dark:bg-slate-950 dark:text-slate-100">
+
+	<header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-sm dark:bg-slate-900 dark:border-slate-800">
+		<div class="flex items-center gap-2">
+			<svg width="72" height="48" viewBox="0 0 96 48" class="text-indigo-600" aria-label="CollabDraw CD logo">
+				<path d="M38 8a16 16 0 1 0 0 32" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+				<path d="M54 8h7a16 16 0 0 1 0 32h-7V8Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round" />
+			</svg>
+		</div>
+
+		<div class="flex items-center gap-3">
+			<button (click)="toggleTheme()" [attr.aria-label]="darkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+				[attr.title]="darkMode ? 'Light mode' : 'Dark mode'"
+				class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white">
+				@if (darkMode) {
+					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+						fill="currentColor" aria-hidden="true">
+						<path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
+					</svg>
+				} @else {
+					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+						fill="currentColor" aria-hidden="true">
+						<path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" />
+					</svg>
+				}
+			</button>
+			<div class="relative">
+				<button (click)="participantsOpen = !participantsOpen" [attr.aria-expanded]="participantsOpen"
+					aria-label="Show room details and participants" title="Room details"
+					class="relative hidden md:flex items-center rounded-lg p-1.5 text-slate-700 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white">
+				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+					fill="currentColor" aria-hidden="true">
+					<path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm146.5-204.5Q340-521 340-580t40.5-99.5Q421-720 480-720t99.5 40.5Q620-639 620-580t-40.5 99.5Q539-440 480-440t-99.5-40.5ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm100-95.5q47-15.5 86-44.5-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160q53 0 100-15.5ZM523-537q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17Zm-43-43Zm0 360Z" />
+				</svg>
+				@if (activeUsers.length > 1) {
+					<span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-white">
+						{{ activeUsers.length }}
+					</span>
+				}
+				</button>
+
+			</div>
+
+			<button (click)="leaveRoom()" [disabled]="leaving" aria-label="Leave room" title="Leave room"
+				class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:text-slate-900 disabled:opacity-50 dark:text-slate-200 dark:hover:text-white">
+				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+					fill="currentColor" aria-hidden="true">
+					<path d="M200-120q-33 0-56.5-23.5T120-200v-160h80v160h560v-560H200v160h-80v-160q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm220-160-56-58 102-102H120v-80h346L364-622l56-58 200 200-200 200Z" />
+				</svg>
+			</button>
+		</div>
+	</header>
+
+	<div class="relative min-h-0 flex-1 bg-slate-100 p-1 sm:p-2 dark:bg-slate-950">
+		<div class="flex h-full w-full gap-2 overflow-hidden">
+		<div class="relative min-w-0 flex-1 items-stretch justify-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_-24px_rgba(15,23,42,0.45)] dark:border-slate-800 dark:bg-slate-900">
+			<canvas #canvas width="900" height="600"
+				(mousedown)="onMouseDown($event)"
+				(mousemove)="onMouseMove($event)"
+				(mouseup)="stopDrawing()"
+				(mouseleave)="stopDrawing()"
+				class="h-full w-full cursor-crosshair block rounded-2xl bg-white ring-1 ring-inset ring-slate-200 dark:bg-slate-900 dark:ring-slate-800"></canvas>
+
+			<div class="absolute bottom-5 left-5 z-50 flex items-center gap-1 rounded-full bg-white/95 p-2 shadow-xl ring-1 ring-slate-200 backdrop-blur dark:bg-slate-800/95 dark:ring-slate-700">
+				<button (click)="undo()" [disabled]="!canUndo" aria-label="Undo"
+					class="flex h-10 w-10 items-center justify-center rounded-full text-xl text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30 dark:text-slate-200 dark:hover:bg-slate-700">
+					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+						fill="currentColor" aria-hidden="true">
+						<path d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z" />
+					</svg>
+				</button>
+				<button (click)="redo()" [disabled]="!canRedo" aria-label="Redo"
+					class="flex h-10 w-10 items-center justify-center rounded-full text-xl text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30 dark:text-slate-200 dark:hover:bg-slate-700">
+					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+						fill="currentColor" aria-hidden="true">
+						<path d="M396-200q-97 0-166.5-63T160-420q0-94 69.5-157T396-640h252L544-744l56-56 200 200-200 200-56-56 104-104H396q-63 0-109.5 40T240-420q0 60 46.5 100T396-280h284v80H396Z" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="absolute bottom-5 right-5 z-50 flex flex-row-reverse items-center gap-2 rounded-full bg-white/95 p-2 shadow-xl ring-1 ring-slate-200 backdrop-blur dark:bg-slate-800/95 dark:ring-slate-700">
+				<button (click)="toolsOpen = !toolsOpen" aria-label="Open pen settings"
+					class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-slate-900 text-2xl leading-none text-white shadow-sm transition hover:bg-slate-700">
+					<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+						fill="currentColor" aria-hidden="true">
+						<path d="M363-280ZM46-160l138-276q10-20 28.5-32t41.5-12q24 0 44 12.5t29 35.5l27 66q2 6 9 5.5t9-6.5l86-287q14-48 53.5-77t89.5-29q49 0 87.5 28.5T742-657l36 104q-15 5-28.5 13T724-520l-14 15-44-127q-8-23-25-35.5T601-680q-23 0-40.5 13T535-631l-86 287q-9 28-32.5 46T363-280q-27 0-50-14.5T280-335l-27-66-118 241H46Zm514 40v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T903-340L683-120H560Zm300-263-37-37 37 37ZM620-180h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19ZM240-560q-50 0-85-35.5T120-680q0-50 35-85t85-35q50 0 85 35t35 85q0 49-35 84.5T240-560Zm0-80q17 0 28.5-11.5T280-680q0-17-11.5-28.5T240-720q-17 0-28.5 11.5T200-680q0 17 11.5 28.5T240-640Zm0-40Z" />
+					</svg>
+				</button>
+				@if (toolsOpen) {
+					<div class="flex items-center gap-2 pr-1">
+						@for (size of [2, 4, 7, 11]; track size) {
+							<button (click)="penSize = size" [attr.aria-label]="'Pen size ' + size"
+								[class.bg-slate-100]="penSize === size"
+								class="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+								<span class="rounded-full bg-slate-800 dark:bg-slate-200" [style.width.px]="size + 2" [style.height.px]="size + 2"></span>
+							</button>
+						}
+						<span class="mx-1 h-7 w-px bg-slate-200"></span>
+						@for (color of ['#1e293b', '#ef4444', '#2563eb', '#16a34a', '#f59e0b']; track color) {
+							<button (click)="penColor = color" [attr.aria-label]="'Pen colour ' + color"
+								[class.ring-2]="penColor === color" [class.ring-indigo-500]="penColor === color"
+								class="h-7 w-7 rounded-full ring-offset-2" [style.background-color]="color"></button>
+						}
+						<span class="h-7 w-px bg-slate-200 dark:bg-slate-600"></span>
+						<button (click)="resetBoard()" aria-label="Reset board" title="Reset board"
+							class="flex h-9 w-9 items-center justify-center rounded-lg text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+							↺
+						</button>
+					</div>
+				}
+			</div>
+
+			@for (cursor of remoteCursors; track cursor.connectionId) {
+				<div class="absolute pointer-events-none z-50 transition-all duration-75"
+					[style.left.px]="cursorLeft(cursor.x)" [style.top.px]="cursorTop(cursor.y)">
+					<div class="flex items-center gap-1 translate-x-2 -translate-y-1/2">
+						@if (cursor.isDrawing) {
+							<span class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-sm text-white ring-2 ring-white shadow">
+								<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px"
+									fill="currentColor" aria-hidden="true">
+									<path d="M363-280ZM46-160l138-276q10-20 28.5-32t41.5-12q24 0 44 12.5t29 35.5l27 66q2 6 9 5.5t9-6.5l86-287q14-48 53.5-77t89.5-29q49 0 87.5 28.5T742-657l36 104q-15 5-28.5 13T724-520l-14 15-44-127q-8-23-25-35.5T601-680q-23 0-40.5 13T535-631l-86 287q-9 28-32.5 46T363-280q-27 0-50-14.5T280-335l-27-66-118 241H46Zm514 40v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T903-340L683-120H560Zm300-263-37-37 37 37ZM620-180h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19ZM240-560q-50 0-85-35.5T120-680q0-50 35-85t85-35q50 0 85 35t35 85q0 49-35 84.5T240-560Zm0-80q17 0 28.5-11.5T280-680q0-17-11.5-28.5T240-720q-17 0-28.5 11.5T200-680q0 17 11.5 28.5T240-640Zm0-40Z" />
+								</svg>
+							</span>
+						}
+						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold text-white ring-2 ring-white shadow">
+							{{ cursor.userName.slice(0, 1).toUpperCase() }}
+						</span>
+						<span class="rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white shadow whitespace-nowrap">
+							{{ cursor.userName }}
+						</span>
+					</div>
+				</div>
+			}
+		</div>
+
+		@if (participantsOpen) {
+			<aside class="flex h-full w-72 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+				<div class="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+					<h2 class="text-base font-semibold text-slate-800 dark:text-slate-100">Room details</h2>
+					<button (click)="participantsOpen = false" aria-label="Close participants panel"
+						class="flex h-8 w-8 items-center justify-center rounded-lg text-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-100">&times;</button>
+				</div>
+				<div class="flex items-center justify-between gap-3 border-b border-slate-100 py-4 dark:border-slate-800">
+					<div class="min-w-0">
+						<p class="text-[11px] uppercase tracking-wide text-slate-400">Room</p>
+						<p class="truncate font-mono text-sm font-medium text-slate-700 dark:text-slate-200">{{ roomId }}</p>
+					</div>
+					<button (click)="copyRoomId()" [attr.aria-label]="copied ? 'Room ID copied' : 'Copy room ID'"
+						[attr.title]="copied ? 'Copied' : 'Copy room ID'"
+						class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">
+						<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+							fill="currentColor" aria-hidden="true">
+							<path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z" />
+						</svg>
+					</button>
+				</div>
+				<div class="flex min-h-0 flex-1 flex-col pt-4">
+					<div class="mb-3 flex items-center justify-between">
+						<p class="text-[11px] uppercase tracking-wide text-slate-400">Participants</p>
+						<span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ activeUsers.length }}</span>
+					</div>
+					<div class="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1" (scroll)="loadMoreParticipants($event)">
+						@for (user of visibleParticipants; track user.connectionId) {
+							<div class="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800">
+								<span class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
+									{{ user.userName.slice(0, 1).toUpperCase() }}
+								</span>
+								<span class="truncate text-sm text-slate-700 dark:text-slate-200">{{ user.userName }}</span>
+							</div>
+						}
+					</div>
+
+					@if (resetConfirmOpen) {
+						<div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+							<div role="dialog" aria-modal="true" aria-labelledby="reset-title"
+								class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+								<h2 id="reset-title" class="text-base font-semibold text-slate-900 dark:text-slate-100">Reset board?</h2>
+								<p class="mt-2 text-sm leading-5 text-slate-500 dark:text-slate-300">
+									This clears the drawing for everyone in the room.
+								</p>
+								<div class="mt-5 flex justify-end gap-2">
+									<button (click)="cancelReset()"
+										class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+										Cancel
+									</button>
+									<button (click)="confirmReset()"
+										class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700">
+										Reset board
+									</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</aside>
+		}
+		</div>
+	</div>
+</div>
