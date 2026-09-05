@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Y from 'yjs';
 import { RemoteCursor, RoomUser, SignalrService } from '../../services/signalr';
@@ -12,7 +12,8 @@ const BOARD_HEIGHT = 600;
 @Component({
   selector: 'app-board',
   standalone: true,
-  templateUrl: './board.html'
+  templateUrl: './board.html',
+  styleUrl: './board.css'
 })
 export class BoardComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -25,6 +26,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
   penColor = '#1e293b';
   penSize = 4;
   toolsOpen = false;
+  navbarOpen = false;
   participantsOpen = false;
   resetConfirmOpen = false;
   darkMode = localStorage.getItem('collab-draw-theme') === 'dark';
@@ -32,6 +34,16 @@ export class BoardComponent implements OnInit, AfterViewInit {
   visibleParticipantCount = 25;
   remoteCursors: RemoteCursor[] = [];
   lastPoint: { x: number; y: number } | null = null;
+
+  @HostListener('document:click', ['$event'])
+  closePenSettingsOutside(event: MouseEvent) {
+    if (!this.toolsOpen) return;
+
+    const target = event.target;
+    if (target instanceof Element && !target.closest('.pen-toolbar')) {
+      this.toolsOpen = false;
+    }
+  }
 
   private yDoc = new Y.Doc();
   private ySegments = this.yDoc.getArray<Segment>('segments');
@@ -233,7 +245,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
       const first = path[0];
       ctx.strokeStyle = first.color;
-      ctx.lineWidth = first.size ?? 2;
+      ctx.lineWidth = Math.max(first.size ?? 2, 1.5);
       ctx.beginPath();
       ctx.moveTo(first.x1, first.y1);
       for (const segment of path) {
@@ -264,12 +276,15 @@ export class BoardComponent implements OnInit, AfterViewInit {
   private configureCanvasResolution() {
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
-    const scale = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.round(rect.width * scale));
-    canvas.height = Math.max(1, Math.round(rect.height * scale));
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 3);
+    canvas.width = Math.max(1, Math.round(rect.width * pixelRatio));
+    canvas.height = Math.max(1, Math.round(rect.height * pixelRatio));
 
     const ctx = canvas.getContext('2d');
-    ctx?.scale(canvas.width / BOARD_WIDTH, canvas.height / BOARD_HEIGHT);
+    if (!ctx) return;
+
+    ctx.setTransform(canvas.width / BOARD_WIDTH, 0, 0, canvas.height / BOARD_HEIGHT, 0, 0);
+    ctx.imageSmoothingEnabled = true;
   }
 
   private sendCursor(point: { x: number; y: number }, isDrawing: boolean) {
