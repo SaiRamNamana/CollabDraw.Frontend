@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  signalRUrl: 'http://localhost:5227/hubs/drawing'
-} as const;
+  signalRUrl: 'https://collabdraw-backend-21yw.onrender.com/hubs/drawing'
+};
